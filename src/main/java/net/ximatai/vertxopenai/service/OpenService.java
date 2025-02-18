@@ -10,12 +10,21 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/**
+ * 消息服务
+ */
 public class OpenService implements IOpenService {
 
     private Vertx vertx;
     private String apiKey;
     private String baseUrl;
 
+    /**
+     * 创建消息服务
+     *
+     * @param apiKey  apiKey
+     * @param baseUrl baseUrl
+     */
     public OpenService(String apiKey, String baseUrl) {
         this.apiKey = apiKey;
         this.baseUrl = baseUrl;

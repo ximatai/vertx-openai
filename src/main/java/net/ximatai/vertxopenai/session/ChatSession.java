@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 开启会话
+ */
 public class ChatSession {
 
     private final Logger logger = LoggerFactory.getLogger(ChatSession.class);
@@ -24,6 +27,14 @@ public class ChatSession {
     private WebClient webClient;
     private List<IMessage> messages = new ArrayList<>();
 
+    /**
+     * 开启会话
+     *
+     * @param apiKey    apiKey
+     * @param chatPath  chat接口路径
+     * @param config    模型可选配置，如：frequency_penalty、max_tokens、temperature 等
+     * @param webClient webClient
+     */
     public ChatSession(String apiKey, String chatPath, JsonObject config, WebClient webClient) {
         this.apiKey = apiKey;
         this.chatPath = chatPath;
@@ -31,10 +42,22 @@ public class ChatSession {
         this.webClient = webClient;
     }
 
+    /**
+     * 发送消息
+     *
+     * @param message 消息字符串
+     * @return 返回消息（异步）
+     */
     public Future<IMessage> send(String message) {
         return this.send(new OpenMessage(message, MessageRole.USER));
     }
 
+    /**
+     * 发送消息
+     *
+     * @param message 消息体
+     * @return 返回消息（异步）
+     */
     public Future<IMessage> send(IMessage message) {
         Promise<IMessage> promise = Promise.promise();
 
@@ -69,6 +92,9 @@ public class ChatSession {
                 .put("messages", messages.stream().map(IMessage::toJson).toList());
     }
 
+    /**
+     * 清空消息历史
+     */
     public void clearMessages() {
         messages.clear();
     }
