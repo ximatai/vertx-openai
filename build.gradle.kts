@@ -80,6 +80,7 @@ dependencies {
     testImplementation(libs.vertx.junit5)
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("ch.qos.logback:logback-classic:1.5.16")
 }
 
 tasks.test {

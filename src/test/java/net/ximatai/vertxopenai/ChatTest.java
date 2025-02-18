@@ -11,10 +11,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ExtendWith(VertxExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ChatTest {
+
+    private final Logger logger = LoggerFactory.getLogger(ChatTest.class);
 
     String url = "https://api.siliconflow.cn/v1/chat/completions";
 
@@ -32,7 +36,7 @@ public class ChatTest {
         chatSession.send("你好，你是谁？")
                 .onSuccess(message -> {
                     String content = message.content();
-                    System.out.println(content);
+                    logger.info(content);
                     Assertions.assertNotNull(content);
                     testContext.completeNow();
                 })
@@ -47,6 +51,7 @@ public class ChatTest {
                 .toCompletableFuture()
                 .join();
 
+        logger.info(message.content());
         Assertions.assertNotNull(message.content());
     }
 
