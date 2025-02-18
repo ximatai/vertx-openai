@@ -19,12 +19,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ChatTest {
 
+    String key = "sk-ztesneqsatkvopokaxwhjwchpzgubsstdzevzzkvrtrolaqs";
+    String url = "https://api.siliconflow.cn/v1/chat/completions";
+
     ChatSession chatSession;
 
     @BeforeAll
     void beforeAll() {
-        String key = "sk-ztesneqsatkvopokaxwhjwchpzgubsstdzevzzkvrtrolaqs";
-        String url = "https://api.siliconflow.cn/v1/chat/completions";
         IOpenService service = IOpenService.create(key, url);
         chatSession = service.connect("deepseek-ai/DeepSeek-R1-Distill-Qwen-7B");
     }
@@ -37,7 +38,8 @@ public class ChatTest {
                     System.out.println(content);
                     Assertions.assertNotNull(content);
                     testContext.completeNow();
-                });
+                })
+                .onFailure(testContext::failNow);
     }
 
 }

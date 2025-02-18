@@ -2,6 +2,7 @@ package net.ximatai.vertxopenai.session;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpResponseExpectation;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
 import net.ximatai.vertxopenai.message.IMessage;
@@ -45,6 +46,7 @@ public class ChatSession {
                 .sendJsonObject(
                         messagesToJson()
                 )
+                .expecting(HttpResponseExpectation.SC_SUCCESS)
                 .onSuccess(res -> {
                     logger.debug("http status: {}", res.statusCode());
                     logger.debug("http body: {}", res.bodyAsString());
