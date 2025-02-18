@@ -49,9 +49,10 @@ public class ChatSession {
                     logger.debug("http status: {}", res.statusCode());
                     logger.debug("http body: {}", res.bodyAsString());
                     JsonObject object = res.bodyAsJsonObject();
-
                     JsonObject jsonMessage = object.getJsonArray("choices").getJsonObject(0).getJsonObject("message");
-                    promise.complete(new OpenMessage(jsonMessage));
+                    OpenMessage responseMessage = new OpenMessage(jsonMessage);
+                    messages.add(responseMessage);
+                    promise.complete(responseMessage);
                 })
                 .onFailure(err -> {
                     logger.error(err.getMessage());
