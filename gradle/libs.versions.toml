@@ -1,0 +1,8 @@
+[versions]
+vertx = "4.5.13"
+slf4j = "2.0.16"
+
+[libraries]
+vertx-web-client = { module = "io.vertx:vertx-web-client", version.ref = "vertx" }
+vertx-junit5 = { module = "io.vertx:vertx-junit5", version.ref = "vertx" }
+slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
