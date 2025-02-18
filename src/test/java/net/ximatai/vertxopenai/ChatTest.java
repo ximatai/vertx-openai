@@ -16,14 +16,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ChatTest {
 
-    String key = "sk-ztesneqsatkvopokaxwhjwchpzgubsstdzevzzkvrtrolaqs";
     String url = "https://api.siliconflow.cn/v1/chat/completions";
 
     ChatSession chatSession;
 
     @BeforeAll
     void beforeAll() {
-        IOpenService service = IOpenService.create(key, url);
+        IOpenService service = IOpenService.create(System.getenv("SF_API_KEY"), url);
         chatSession = service.connect("deepseek-ai/DeepSeek-R1-Distill-Qwen-7B");
     }
 
