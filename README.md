@@ -7,10 +7,12 @@ package net.ximatai.vertxopenai;
 
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import net.ximatai.vertxopenai.message.IMessage;
 import net.ximatai.vertxopenai.service.IOpenService;
 import net.ximatai.vertxopenai.session.ChatSession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +33,7 @@ public class ChatTest {
     }
 
     @Test
+    @DisplayName("对话测试（异步）")
     void testChat(VertxTestContext testContext) {
         chatSession.send("你好，你是谁？")
                 .onSuccess(message -> {
@@ -40,6 +43,17 @@ public class ChatTest {
                     testContext.completeNow();
                 })
                 .onFailure(testContext::failNow);
+    }
+
+    @Test
+    @DisplayName("对话测试（同步）")
+    void testChatSync() {
+        IMessage message = chatSession.send("你好，你是谁？")
+                .toCompletionStage()
+                .toCompletableFuture()
+                .join();
+
+        Assertions.assertNotNull(message.content());
     }
 
 }
