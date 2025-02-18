@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ChatTest {
 
+    // 此处的 key 仅供示意，不能用的哦。
     String key = "sk-ztesneqsatkvopokaxwhjwchpzgubsstdzevzzkvrtrolaqs";
     String url = "https://api.siliconflow.cn/v1/chat/completions";
 
