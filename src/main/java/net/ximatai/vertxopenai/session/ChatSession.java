@@ -69,4 +69,7 @@ public class ChatSession {
                 .put("messages", messages.stream().map(IMessage::toJson).toList());
     }
 
+    public void clearMessages() {
+        messages.clear();
+    }
 }
