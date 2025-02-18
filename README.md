@@ -1,7 +1,28 @@
 # Vertx-OpenAI
+
 ### 采用 Vert.x Web Client 对 OpenAI 的 API进行一层薄封装，兼容 DeepSeek、SiliconFlow
 
-### 示例
+### 使用
+
+#### gradle
+
+```groovy
+implementation("net.ximatai:vertx-openai:1.25.1")
+```
+
+#### maven
+
+```xml
+
+<dependency>
+    <groupId>net.ximatai</groupId>
+    <artifactId>vertx-openai</artifactId>
+    <version>1.25.1</version>
+</dependency>
+```
+
+#### 一个测试用例
+
 ```java
 package net.ximatai.vertxopenai;
 
