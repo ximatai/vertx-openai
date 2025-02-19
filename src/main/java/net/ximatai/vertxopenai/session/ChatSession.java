@@ -152,6 +152,11 @@ public class ChatSession {
         messages.clear();
     }
 
+    /**
+     * 获取会话中所有消息列表
+     *
+     * @return 消息列表
+     */
     public List<IMessage> getMessages() {
         return messages;
     }
