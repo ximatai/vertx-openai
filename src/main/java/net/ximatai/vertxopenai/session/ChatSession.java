@@ -54,7 +54,7 @@ public class ChatSession {
 
     /**
      * 设置模型配置
-     * @param config
+     * @param config 配置
      */
     public void setConfig(JsonObject config) {
         this.config = config;
@@ -62,7 +62,7 @@ public class ChatSession {
 
     /**
      * 获取模型配置
-     * @return
+     * @return 模型配置
      */
     public JsonObject getConfig() {
         return config;
