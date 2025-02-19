@@ -53,6 +53,22 @@ public class ChatSession {
     }
 
     /**
+     * 设置模型配置
+     * @param config
+     */
+    public void setConfig(JsonObject config) {
+        this.config = config;
+    }
+
+    /**
+     * 获取模型配置
+     * @return
+     */
+    public JsonObject getConfig() {
+        return config;
+    }
+
+    /**
      * 发送消息
      *
      * @param message 消息体

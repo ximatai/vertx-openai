@@ -1,5 +1,6 @@
 package net.ximatai.vertxopenai;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import net.ximatai.vertxopenai.message.IMessage;
@@ -46,6 +47,19 @@ public class ChatTest {
     @Test
     @DisplayName("对话测试（同步）")
     void testChatSync() {
+        IMessage message = chatSession.send("你好，你是谁？")
+                .toCompletionStage()
+                .toCompletableFuture()
+                .join();
+
+        logger.info(message.content());
+        Assertions.assertNotNull(message.content());
+    }
+
+    @Test
+    @DisplayName("改变模型配置后，对话测试（同步）")
+    void testConfigChanged() {
+        chatSession.setConfig(new JsonObject().put("model", "meta-llama/Meta-Llama-3.1-8B-Instruct"));
         IMessage message = chatSession.send("你好，你是谁？")
                 .toCompletionStage()
                 .toCompletableFuture()

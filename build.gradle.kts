@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "net.ximatai"
-version = "1.25.1"
+version = "1.25.2"
 
 java {
     toolchain {
