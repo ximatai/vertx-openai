@@ -43,6 +43,24 @@ public class ChatSession {
     }
 
     /**
+     * 设置模型配置
+     *
+     * @param config 配置
+     */
+    public void setConfig(JsonObject config) {
+        this.config = config;
+    }
+
+    /**
+     * 获取模型配置
+     *
+     * @return 模型配置
+     */
+    public JsonObject getConfig() {
+        return config;
+    }
+
+    /**
      * 发送消息
      *
      * @param message 消息字符串
@@ -53,37 +71,56 @@ public class ChatSession {
     }
 
     /**
-     * 设置模型配置
-     * @param config 配置
-     */
-    public void setConfig(JsonObject config) {
-        this.config = config;
-    }
-
-    /**
-     * 获取模型配置
-     * @return 模型配置
-     */
-    public JsonObject getConfig() {
-        return config;
-    }
-
-    /**
      * 发送消息
      *
      * @param message 消息体
      * @return 返回消息（异步）
      */
     public Future<IMessage> send(IMessage message) {
+        messages.add(message);
+
+        return sendBatch(messages)
+                .compose(result -> {
+                    messages.add(result);
+                    return Future.succeededFuture(result);
+                });
+    }
+
+    /**
+     * 发送消息
+     *
+     * @param message 消息字符串
+     * @return 返回消息（异步）
+     */
+    public Future<IMessage> sendOnce(String message) {
+        return this.sendOnce(new OpenMessage(message, MessageRole.USER));
+    }
+
+    /**
+     * 发送一次性消息
+     *
+     * @param message 消息体
+     * @return 返回消息（异步）
+     */
+    public Future<IMessage> sendOnce(IMessage message) {
+        return sendBatch(List.of(message));
+    }
+
+    /**
+     * 发送消息对话
+     *
+     * @param messages 消息列表
+     * @return 返回消息（异步）
+     */
+    public Future<IMessage> sendBatch(List<IMessage> messages) {
         Promise<IMessage> promise = Promise.promise();
 
-        messages.add(message);
         webClient
                 .post(chatPath)
                 .putHeader("Content-Type", "application/json")
                 .putHeader("Authorization", "Bearer " + apiKey)
                 .sendJsonObject(
-                        messagesToJson()
+                        messagesToJson(messages)
                 )
                 .expecting(HttpResponseExpectation.SC_SUCCESS)
                 .onSuccess(res -> {
@@ -92,7 +129,7 @@ public class ChatSession {
                     JsonObject object = res.bodyAsJsonObject();
                     JsonObject jsonMessage = object.getJsonArray("choices").getJsonObject(0).getJsonObject("message");
                     OpenMessage responseMessage = new OpenMessage(jsonMessage);
-                    messages.add(responseMessage);
+
                     promise.complete(responseMessage);
                 })
                 .onFailure(err -> {
@@ -103,7 +140,7 @@ public class ChatSession {
         return promise.future();
     }
 
-    private JsonObject messagesToJson() {
+    private JsonObject messagesToJson(List<IMessage> messages) {
         return config.copy()
                 .put("messages", messages.stream().map(IMessage::toJson).toList());
     }
@@ -113,5 +150,9 @@ public class ChatSession {
      */
     public void clearMessages() {
         messages.clear();
+    }
+
+    public List<IMessage> getMessages() {
+        return messages;
     }
 }

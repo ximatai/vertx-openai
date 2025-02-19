@@ -34,11 +34,13 @@ public class ChatTest {
     @Test
     @DisplayName("对话测试（异步）")
     void testChat(VertxTestContext testContext) {
+        chatSession.clearMessages();
         chatSession.send("你好，你是谁？")
                 .onSuccess(message -> {
                     String content = message.content();
                     logger.info(content);
                     Assertions.assertNotNull(content);
+                    Assertions.assertEquals(2, chatSession.getMessages().size());
                     testContext.completeNow();
                 })
                 .onFailure(testContext::failNow);
@@ -47,18 +49,31 @@ public class ChatTest {
     @Test
     @DisplayName("对话测试（同步）")
     void testChatSync() {
+        chatSession.clearMessages();
         IMessage message = chatSession.send("你好，你是谁？")
                 .toCompletionStage()
                 .toCompletableFuture()
                 .join();
 
         logger.info(message.content());
+
+        Assertions.assertEquals(2, chatSession.getMessages().size());
+        Assertions.assertNotNull(message.content());
+
+        message = chatSession.send("好的，很高兴认识你")
+                .toCompletionStage()
+                .toCompletableFuture()
+                .join();
+
+        logger.info(message.content());
+        Assertions.assertEquals(4, chatSession.getMessages().size());
         Assertions.assertNotNull(message.content());
     }
 
     @Test
     @DisplayName("改变模型配置后，对话测试（同步）")
     void testConfigChanged() {
+        chatSession.clearMessages();
         chatSession.setConfig(new JsonObject().put("model", "meta-llama/Meta-Llama-3.1-8B-Instruct"));
         IMessage message = chatSession.send("你好，你是谁？")
                 .toCompletionStage()
@@ -66,6 +81,24 @@ public class ChatTest {
                 .join();
 
         logger.info(message.content());
+
+        Assertions.assertEquals(2, chatSession.getMessages().size());
+        Assertions.assertNotNull(message.content());
+    }
+
+    @Test
+    @DisplayName("测试单次请求")
+    void testSendOnce() {
+        chatSession.clearMessages();
+
+        IMessage message = chatSession.sendOnce("你好，你是谁？")
+                .toCompletionStage()
+                .toCompletableFuture()
+                .join();
+
+        logger.info(message.content());
+
+        Assertions.assertEquals(0, chatSession.getMessages().size());
         Assertions.assertNotNull(message.content());
     }
 
