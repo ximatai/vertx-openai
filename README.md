@@ -7,7 +7,7 @@
 #### gradle
 
 ```groovy
-implementation("net.ximatai:vertx-openai:1.25.1")
+implementation("net.ximatai:vertx-openai:1.25.4")
 ```
 
 #### maven
@@ -17,7 +17,7 @@ implementation("net.ximatai:vertx-openai:1.25.1")
 <dependency>
     <groupId>net.ximatai</groupId>
     <artifactId>vertx-openai</artifactId>
-    <version>1.25.1</version>
+    <version>1.25.4</version>
 </dependency>
 ```
 
