@@ -57,11 +57,14 @@ public class ChatTest {
     @Test
     @DisplayName("对话测试（异步）")
     void testChat(VertxTestContext testContext) {
+        chatSession.clear();
+        chatSession.setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容");
         chatSession.send("你好，你是谁？")
                 .onSuccess(message -> {
                     String content = message.content();
-                    System.out.println(content);
+                    logger.info(content);
                     Assertions.assertNotNull(content);
+                    Assertions.assertEquals(2, chatSession.getMessages().size());
                     testContext.completeNow();
                 })
                 .onFailure(testContext::failNow);
@@ -76,6 +79,27 @@ public class ChatTest {
                 .join();
 
         Assertions.assertNotNull(message.content());
+    }
+
+    @Test
+    @DisplayName("测试Stream版本会话")
+    void testStream(VertxTestContext testContext) {
+        chatSession
+                .clear()
+                .setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容")
+                .sendWithStream("你好", msg -> {
+                    if (msg.isReasoning()) {
+                        logger.info(msg.reasoning()); // 持续输出推理过程
+                    } else {
+                        logger.info(msg.content()); // 持续输出结果
+                    }
+                })
+                .onSuccess(msg -> {
+                    logger.info(msg.content()); // 最终输出结果
+                    testContext.completeNow();
+                })
+                .onFailure(testContext::failNow);
+
     }
 
 }

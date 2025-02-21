@@ -26,5 +26,11 @@ public interface IMessage {
      *
      * @return 转化后消息
      */
-    JsonObject toJson();
+    default JsonObject toJson() {
+        return new JsonObject()
+                .put("content", this.content())
+                .put("role", this.role().toString().toLowerCase());
+    }
+
+    ;
 }
