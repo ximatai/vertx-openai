@@ -163,7 +163,8 @@ public class ChatSession {
     /**
      * 发送消息（stream模式）
      *
-     * @param message 消息内容
+     * @param message      消息内容
+     * @param eventHandler 流式回调
      * @return 返回消息（异步）
      */
     public Future<AssistantMessage> sendWithStream(String message, Handler<AssistantMessage> eventHandler) {
@@ -173,7 +174,8 @@ public class ChatSession {
     /**
      * 发送消息（stream模式）
      *
-     * @param message 消息体
+     * @param message      消息体
+     * @param eventHandler 流式回调
      * @return 返回消息（异步）
      */
     public Future<AssistantMessage> sendWithStream(IMessage message, Handler<AssistantMessage> eventHandler) {
@@ -189,7 +191,8 @@ public class ChatSession {
     /**
      * 发送一次性消息（stream模式）
      *
-     * @param message 消息
+     * @param message      消息
+     * @param eventHandler 流式回调
      * @return 返回消息（异步）
      */
     public Future<AssistantMessage> sendOnceWithStream(String message, Handler<AssistantMessage> eventHandler) {
@@ -199,7 +202,8 @@ public class ChatSession {
     /**
      * 发送一次性消息（stream模式）
      *
-     * @param message 消息
+     * @param message      消息
+     * @param eventHandler 流式回调
      * @return 返回消息（异步）
      */
     public Future<AssistantMessage> sendOnceWithStream(IMessage message, Handler<AssistantMessage> eventHandler) {
