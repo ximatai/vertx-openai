@@ -12,7 +12,6 @@ import net.ximatai.vertxopenai.message.AssistantMessage;
 import net.ximatai.vertxopenai.message.IMessage;
 import net.ximatai.vertxopenai.message.SSEParser;
 import net.ximatai.vertxopenai.message.SystemMessage;
-import net.ximatai.vertxopenai.message.UserMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,59 +82,27 @@ public class ChatSession {
     }
 
     /**
-     * 发送消息
+     * 创建请求
      *
-     * @param message 消息字符串
-     * @return 返回消息（异步）
+     * @return ChatRequest
      */
-    public Future<AssistantMessage> send(String message) {
-        return this.send(new UserMessage(message));
-    }
-
-    /**
-     * 发送消息
-     *
-     * @param message 消息体
-     * @return 返回消息（异步）
-     */
-    public Future<AssistantMessage> send(IMessage message) {
-        messages.add(message);
-
-        return sendBatch(messages)
-                .compose(result -> {
-                    messages.add(result.simple());
-                    return Future.succeededFuture(result);
-                });
-    }
-
-    /**
-     * 发送消息
-     *
-     * @param message 消息字符串
-     * @return 返回消息（异步）
-     */
-    public Future<AssistantMessage> sendOnce(String message) {
-        return this.sendOnce(new UserMessage(message));
-    }
-
-    /**
-     * 发送一次性消息
-     *
-     * @param message 消息
-     * @return 返回消息（异步）
-     */
-    public Future<AssistantMessage> sendOnce(IMessage message) {
-        return sendBatch(List.of(message));
+    public ChatRequest request() {
+        return new ChatRequest(this);
     }
 
     /**
      * 发送消息对话
      *
-     * @param messages 消息列表
-     * @return 返回消息（异步）
+     * @param messages    消息列表
+     * @param isTemporary 是否临时消息
+     * @return AI返回消息（异步）
      */
-    public Future<AssistantMessage> sendBatch(List<IMessage> messages) {
+    public Future<AssistantMessage> sendBatch(List<IMessage> messages, boolean isTemporary) {
         Promise<AssistantMessage> promise = Promise.promise();
+
+        if (!isTemporary) {
+            this.messages.addAll(messages);
+        }
 
         webClient
                 .post(chatPath)
@@ -150,6 +117,10 @@ public class ChatSession {
                     logger.debug("http body: {}", res.bodyAsString());
                     AssistantMessage responseMessage = new AssistantMessage(res.bodyAsJsonObject());
 
+                    if (!isTemporary) {
+                        this.messages.add(responseMessage.simple());
+                    }
+
                     promise.complete(responseMessage);
                 })
                 .onFailure(err -> {
@@ -161,67 +132,22 @@ public class ChatSession {
     }
 
     /**
-     * 发送消息（stream模式）
-     *
-     * @param message      消息内容
-     * @param eventHandler 流式回调
-     * @return 返回消息（异步）
-     */
-    public Future<AssistantMessage> sendWithStream(String message, Handler<AssistantMessage> eventHandler) {
-        return this.sendWithStream(new UserMessage(message), eventHandler);
-    }
-
-    /**
-     * 发送消息（stream模式）
-     *
-     * @param message      消息体
-     * @param eventHandler 流式回调
-     * @return 返回消息（异步）
-     */
-    public Future<AssistantMessage> sendWithStream(IMessage message, Handler<AssistantMessage> eventHandler) {
-        messages.add(message);
-
-        return sendBatchWithStream(messages, eventHandler)
-                .compose(result -> {
-                    messages.add(result.simple());
-                    return Future.succeededFuture(result);
-                });
-    }
-
-    /**
-     * 发送一次性消息（stream模式）
-     *
-     * @param message      消息
-     * @param eventHandler 流式回调
-     * @return 返回消息（异步）
-     */
-    public Future<AssistantMessage> sendOnceWithStream(String message, Handler<AssistantMessage> eventHandler) {
-        return sendOnceWithStream(new UserMessage(message), eventHandler);
-    }
-
-    /**
-     * 发送一次性消息（stream模式）
-     *
-     * @param message      消息
-     * @param eventHandler 流式回调
-     * @return 返回消息（异步）
-     */
-    public Future<AssistantMessage> sendOnceWithStream(IMessage message, Handler<AssistantMessage> eventHandler) {
-        return sendBatchWithStream(List.of(message), eventHandler);
-    }
-
-    /**
      * 发送消息对话（stream模式）
      *
      * @param messages     消息列表
+     * @param isTemporary  是否临时消息
      * @param eventHandler 流式回调
-     * @return 最终完整消息（异步）
+     * @return AI返回消息（异步）
      */
-    public Future<AssistantMessage> sendBatchWithStream(List<IMessage> messages, Handler<AssistantMessage> eventHandler) {
+    public Future<AssistantMessage> sendBatchWithStream(List<IMessage> messages, boolean isTemporary, Handler<AssistantMessage> eventHandler) {
 
         Promise<AssistantMessage> promise = Promise.promise();
         StringBuilder messageBuilder = new StringBuilder();
         AtomicReference<String> lastData = new AtomicReference<>();
+
+        if (!isTemporary) {
+            this.messages.addAll(messages);
+        }
 
         SSEParser sseParser = new SSEParser(data -> {
             AssistantMessage assistantMessage = new AssistantMessage(new JsonObject(data));
@@ -240,7 +166,13 @@ public class ChatSession {
                     )
             ));
 
-            promise.complete(new AssistantMessage(json));
+            AssistantMessage assistantMessage = new AssistantMessage(json);
+
+            if (!isTemporary) {
+                this.messages.add(assistantMessage.simple());
+            }
+
+            promise.complete(assistantMessage);
         });
 
         webClient

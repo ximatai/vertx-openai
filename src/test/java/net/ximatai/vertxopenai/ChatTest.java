@@ -36,7 +36,9 @@ public class ChatTest {
     void testChat(VertxTestContext testContext) {
         chatSession.clear();
         chatSession.setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容");
-        chatSession.send("你好，你是谁？")
+        chatSession.request()
+                .addMessage("你好，你是谁？")
+                .send()
                 .onSuccess(message -> {
                     String content = message.content();
                     logger.info(content);
@@ -51,7 +53,10 @@ public class ChatTest {
     @DisplayName("对话测试（同步）")
     void testChatSync() {
         chatSession.clear();
-        AssistantMessage message = chatSession.send("你好，你是谁？")
+        AssistantMessage message = chatSession
+                .request()
+                .addMessage("你好，你是谁？")
+                .send()
                 .toCompletionStage()
                 .toCompletableFuture()
                 .join();
@@ -61,7 +66,10 @@ public class ChatTest {
         Assertions.assertEquals(2, chatSession.getMessages().size());
         Assertions.assertNotNull(message.content());
 
-        message = chatSession.send("好的，很高兴认识你")
+        message = chatSession
+                .request()
+                .addMessage("你好，你是谁？")
+                .send()
                 .toCompletionStage()
                 .toCompletableFuture()
                 .join();
@@ -76,7 +84,10 @@ public class ChatTest {
     void testConfigChanged() {
         chatSession.clear();
         chatSession.setConfig(new JsonObject().put("model", "meta-llama/Meta-Llama-3.1-8B-Instruct"));
-        AssistantMessage message = chatSession.send("你好，你是谁？")
+        AssistantMessage message = chatSession
+                .request()
+                .addMessage("你好，你是谁？")
+                .send()
                 .toCompletionStage()
                 .toCompletableFuture()
                 .join();
@@ -92,7 +103,11 @@ public class ChatTest {
     void testSendOnce() {
         chatSession.clear();
 
-        AssistantMessage message = chatSession.sendOnce("你好，你是谁？")
+        AssistantMessage message = chatSession
+                .request()
+                .temporary()
+                .addMessage("你好，你是谁")
+                .send()
                 .toCompletionStage()
                 .toCompletableFuture()
                 .join();
@@ -109,13 +124,16 @@ public class ChatTest {
         chatSession
                 .clear()
                 .setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容")
-                .sendWithStream("你好", msg -> {
+                .request()
+                .addMessage("你好，你是谁？")
+                .stream(msg -> {
                     if (msg.isReasoning()) {
                         logger.info(msg.reasoning()); // 持续输出推理过程
                     } else {
                         logger.info(msg.content()); // 持续输出结果
                     }
                 })
+                .send()
                 .onSuccess(msg -> {
                     logger.info(msg.content()); // 最终输出结果
                     testContext.completeNow();
