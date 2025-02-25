@@ -86,7 +86,7 @@ public class ChatSession {
      *
      * @return ChatRequest
      */
-    public ChatRequest request() {
+    public ChatRequest open() {
         return new ChatRequest(this);
     }
 

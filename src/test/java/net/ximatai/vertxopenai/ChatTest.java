@@ -36,7 +36,7 @@ public class ChatTest {
     void testChat(VertxTestContext testContext) {
         chatSession.clear();
         chatSession.setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容");
-        chatSession.request()
+        chatSession.open()
                 .addMessage("你好，你是谁？")
                 .send()
                 .onSuccess(message -> {
@@ -54,7 +54,7 @@ public class ChatTest {
     void testChatSync() {
         chatSession.clear();
         AssistantMessage message = chatSession
-                .request()
+                .open()
                 .addMessage("你好，你是谁？")
                 .send()
                 .toCompletionStage()
@@ -67,7 +67,7 @@ public class ChatTest {
         Assertions.assertNotNull(message.content());
 
         message = chatSession
-                .request()
+                .open()
                 .addMessage("你好，你是谁？")
                 .send()
                 .toCompletionStage()
@@ -85,7 +85,7 @@ public class ChatTest {
         chatSession.clear();
         chatSession.setConfig(new JsonObject().put("model", "meta-llama/Meta-Llama-3.1-8B-Instruct"));
         AssistantMessage message = chatSession
-                .request()
+                .open()
                 .addMessage("你好，你是谁？")
                 .send()
                 .toCompletionStage()
@@ -104,7 +104,7 @@ public class ChatTest {
         chatSession.clear();
 
         AssistantMessage message = chatSession
-                .request()
+                .open()
                 .temporary()
                 .addMessage("你好，你是谁")
                 .send()
@@ -124,7 +124,7 @@ public class ChatTest {
         chatSession
                 .clear()
                 .setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容")
-                .request()
+                .open()
                 .addMessage("你好，你是谁？")
                 .stream(msg -> {
                     if (msg.isReasoning()) {

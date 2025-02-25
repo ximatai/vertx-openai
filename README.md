@@ -7,7 +7,7 @@
 #### gradle
 
 ```groovy
-implementation("net.ximatai:vertx-openai:1.25.5")
+implementation("net.ximatai:vertx-openai:1.25.6")
 ```
 
 #### maven
@@ -17,7 +17,7 @@ implementation("net.ximatai:vertx-openai:1.25.5")
 <dependency>
     <groupId>net.ximatai</groupId>
     <artifactId>vertx-openai</artifactId>
-    <version>1.25.5</version>
+    <version>1.25.6</version>
 </dependency>
 ```
 
@@ -59,7 +59,7 @@ public class ChatTest {
     void testChat(VertxTestContext testContext) {
         chatSession.clear();
         chatSession.setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容");
-        chatSession.request()
+        chatSession.open()
                 .addMessage("你好，你是谁？")
                 .send()
                 .onSuccess(message -> {
@@ -76,7 +76,7 @@ public class ChatTest {
     @DisplayName("对话测试（同步）")
     void testChatSync() {
         AssistantMessage message = chatSession
-                .request()
+                .open()
                 .addMessage("你好，你是谁？")
                 .send()
                 .toCompletionStage()
@@ -92,7 +92,7 @@ public class ChatTest {
         chatSession
                 .clear()
                 .setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容")
-                .request()
+                .open()
                 .addMessage("你好，你是谁？")
                 .stream(msg -> {
                     if (msg.isReasoning()) {
