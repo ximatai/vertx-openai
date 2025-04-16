@@ -1,6 +1,7 @@
 package net.ximatai.vertxopenai;
 
 import io.vertx.core.json.JsonObject;
+import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import net.ximatai.vertxopenai.message.AssistantMessage;
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 @ExtendWith(VertxExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -119,11 +122,12 @@ public class ChatTest {
     }
 
     @Test
+    @Timeout(value = 5, timeUnit = TimeUnit.MINUTES)
     @DisplayName("测试Stream版本会话")
     void testStream(VertxTestContext testContext) {
         chatSession
                 .clear()
-                .setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容")
+//                .setSystemMessage("你是一个翻译器，我说中文你返回英文，不需要返回其他多余的内容")
                 .open()
                 .addMessage("你好，你是谁？")
                 .stream(msg -> {

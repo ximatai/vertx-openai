@@ -27,11 +27,11 @@ public class ChatSession {
 
     private final Logger logger = LoggerFactory.getLogger(ChatSession.class);
 
-    private String apiKey;
-    private String chatPath;
+    private final String apiKey;
+    private final String chatPath;
+    private final WebClient webClient;
+    private final List<IMessage> messages = new ArrayList<>();
     private JsonObject config;
-    private WebClient webClient;
-    private List<IMessage> messages = new ArrayList<>();
     private SystemMessage systemMessage;
 
     /**
